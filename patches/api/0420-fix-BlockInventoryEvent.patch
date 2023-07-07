@@ -1,0 +1,74 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: iris <60985521+KaiAF@users.noreply.github.com>
+Date: Fri, 7 Jul 2023 11:53:42 -0500
+Subject: [PATCH] fix BlockInventoryEvent
+
+
+diff --git a/src/main/java/io/papermc/paper/event/block/BlockInventoryEvent.java b/src/main/java/io/papermc/paper/event/block/BlockInventoryEvent.java
+index 3c925d1da64e73bf77b1610e1bd0d6f6d4400abb..7ff957aed1f6f6110cbaf33a2ed8c2782d1513cd 100644
+--- a/src/main/java/io/papermc/paper/event/block/BlockInventoryEvent.java
++++ b/src/main/java/io/papermc/paper/event/block/BlockInventoryEvent.java
+@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
+ 
+ /**
+  * Called when the block's inventory has been interacted with.
++ * Example: Interacting with ChiseledBookshelf
+  */
+ public class BlockInventoryEvent extends BlockEvent implements Cancellable {
+     private static final HandlerList handlers = new HandlerList();
+@@ -21,15 +22,7 @@ public class BlockInventoryEvent extends BlockEvent implements Cancellable {
+     private boolean isRemoved;
+     private boolean cancelled;
+ 
+-    /**
+-     *
+-     * @param player
+-     * @param blockEntity
+-     * @param stack
+-     * @param slot
+-     * @param isRemoved
+-     */
+-    public BlockInventoryEvent(Player player, Block blockEntity, ItemStack stack, int slot, boolean isRemoved) {
++    public BlockInventoryEvent(@NotNull Player player, @NotNull Block blockEntity, @NotNull ItemStack stack, int slot, boolean isRemoved) {
+         super(blockEntity);
+         this.player = player;
+         this.theBlock = blockEntity;
+@@ -40,22 +33,30 @@ public class BlockInventoryEvent extends BlockEvent implements Cancellable {
+ 
+     /**
+      * The player that interacted with the inventory
++     *
+      * @return the player
+      */
++    @NotNull
+     public Player getPlayer() {
+         return player;
+     }
+ 
+     /**
++     * Gets the {@link ItemStack} that was taken or added
++     *
+      * @return the item that was taken / added
+      */
++    @NotNull
+     public ItemStack getItem() {
+         return item;
+     }
+ 
+     /**
++     * Gets the slot that was interacted with on the chiseled bookshelf
++     *
+      * @return the slot
+      */
++    @NotNull
+     public Integer getSlot() {
+         return slot;
+     }
+@@ -63,6 +64,7 @@ public class BlockInventoryEvent extends BlockEvent implements Cancellable {
+     /**
+      * @return true if the item was removed from the inventory
+      */
++    @NotNull
+     public boolean isRemoved() {
+         return isRemoved;
+     }
