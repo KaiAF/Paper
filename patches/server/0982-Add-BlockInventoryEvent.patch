@@ -1,0 +1,45 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: iris <60985521+KaiAF@users.noreply.github.com>
+Date: Fri, 7 Jul 2023 11:26:12 -0500
+Subject: [PATCH] Add BlockInventoryEvent
+
+
+diff --git a/src/main/java/net/minecraft/world/level/block/ChiseledBookShelfBlock.java b/src/main/java/net/minecraft/world/level/block/ChiseledBookShelfBlock.java
+index c83553ac1dd3e98d0caa1d4e708316cb660d3068..1548b3fcb468076096d0818a03970bab7ce506ec 100644
+--- a/src/main/java/net/minecraft/world/level/block/ChiseledBookShelfBlock.java
++++ b/src/main/java/net/minecraft/world/level/block/ChiseledBookShelfBlock.java
+@@ -150,6 +150,13 @@ public class ChiseledBookShelfBlock extends BaseEntityBlock {
+ 
+     private static void addBook(Level world, BlockPos pos, Player player, ChiseledBookShelfBlockEntity blockEntity, ItemStack stack, int slot) {
+         if (!world.isClientSide) {
++            // Paper start
++            org.bukkit.block.Block block = org.bukkit.craftbukkit.block.CraftBlock.at(world, pos);
++            io.papermc.paper.event.block.BlockInventoryEvent event = new io.papermc.paper.event.block.BlockInventoryEvent((org.bukkit.entity.Player) player.getBukkitEntity(), block, org.bukkit.craftbukkit.inventory.CraftItemStack.asBukkitCopy(stack), slot, false);
++            if (!event.callEvent()) {
++                return;
++            }
++            // Paper end
+             player.awardStat(Stats.ITEM_USED.get(stack.getItem()));
+             SoundEvent soundeffect = stack.is(Items.ENCHANTED_BOOK) ? SoundEvents.CHISELED_BOOKSHELF_INSERT_ENCHANTED : SoundEvents.CHISELED_BOOKSHELF_INSERT;
+ 
+@@ -158,13 +165,19 @@ public class ChiseledBookShelfBlock extends BaseEntityBlock {
+             if (player.isCreative()) {
+                 stack.grow(1);
+             }
+-
+             world.gameEvent((Entity) player, GameEvent.BLOCK_CHANGE, pos);
+         }
+     }
+ 
+     private static void removeBook(Level world, BlockPos pos, Player player, ChiseledBookShelfBlockEntity blockEntity, int slot) {
+         if (!world.isClientSide) {
++            // Paper start
++            org.bukkit.block.Block block = org.bukkit.craftbukkit.block.CraftBlock.at(world, pos);
++            io.papermc.paper.event.block.BlockInventoryEvent event = new io.papermc.paper.event.block.BlockInventoryEvent((org.bukkit.entity.Player) player.getBukkitEntity(), block, org.bukkit.craftbukkit.inventory.CraftItemStack.asBukkitCopy(blockEntity.getItem(slot)), slot, true);
++            if (!event.callEvent()) {
++                return;
++            }
++            // Paper end
+             ItemStack itemstack = blockEntity.removeItem(slot, 1);
+             SoundEvent soundeffect = itemstack.is(Items.ENCHANTED_BOOK) ? SoundEvents.CHISELED_BOOKSHELF_PICKUP_ENCHANTED : SoundEvents.CHISELED_BOOKSHELF_PICKUP;
+ 
